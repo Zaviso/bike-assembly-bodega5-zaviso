@@ -47,7 +47,7 @@ function Home() {
             });
             
             if (pin) {
-              if (pin === 'E.Labra5') {
+              if (pin.trim() === 'E.Labra5') {
                 navigate('/admin');
               } else {
                 Swal.fire({
