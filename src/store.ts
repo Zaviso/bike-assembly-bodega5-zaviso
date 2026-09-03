@@ -5,6 +5,7 @@ import { db } from './firebase';
 export type Worker = {
   id: string;
   name: string;
+  createdAt?: number;
 };
 
 export type BikeCatalogItem = {
@@ -12,6 +13,7 @@ export type BikeCatalogItem = {
   code: string;
   description: string;
   image: string; // Base64 or URL
+  createdAt?: number;
 };
 
 export type LogType = 'bike' | 'furniture' | 'warehouse';
@@ -57,13 +59,9 @@ export const getAppData = async (): Promise<AppData> => {
     const catalog = catalogSnapshot.docs.map(d => ({ id: d.id, ...d.data() } as BikeCatalogItem));
     const logs = logsSnapshot.docs.map(d => ({ id: d.id, ...d.data() } as LogEntry));
 
-    // If completely empty, you can still return the fetched empty arrays,
-    // but the user might expect default data if they just started.
-    // For now, let's just return what is in the DB.
-    if (workers.length === 0 && catalog.length === 0 && logs.length === 0) {
-       // Return empty arrays instead of DEFAULT_DATA to avoid confusion, 
-       // or we could push default data to firebase here, but let's just return empty.
-    }
+    // Ordenar por fecha de creación en el cliente para no ocultar los que no tienen createdAt
+    workers.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    catalog.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
     return { workers, catalog, logs };
   } catch (error) {
@@ -81,7 +79,7 @@ export const addLog = async (log: Omit<LogEntry, 'id' | 'timestamp'>) => {
 };
 
 export const addBikeToCatalog = async (bike: Omit<BikeCatalogItem, 'id'>) => {
-  await addDoc(collection(db, 'catalog'), bike);
+  await addDoc(collection(db, 'catalog'), { ...bike, createdAt: Date.now() });
 };
 
 export const removeBikeFromCatalog = async (id: string) => {
@@ -89,7 +87,7 @@ export const removeBikeFromCatalog = async (id: string) => {
 };
 
 export const addWorker = async (name: string) => {
-  await addDoc(collection(db, 'workers'), { name });
+  await addDoc(collection(db, 'workers'), { name, createdAt: Date.now() });
 };
 
 export const removeWorker = async (id: string) => {
