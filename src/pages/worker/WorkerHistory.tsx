@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, FileText } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { getAppData, type BikeCatalogItem, type Worker, type LogEntry } from '../../store';
 
 export function WorkerHistory() {
