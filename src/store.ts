@@ -1,5 +1,5 @@
 
-import { collection, getDocs, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 export type Worker = {
@@ -82,6 +82,10 @@ export const addLog = async (log: Omit<LogEntry, 'id' | 'timestamp'>) => {
 
 export const addBikeToCatalog = async (bike: Omit<BikeCatalogItem, 'id'>) => {
   await addDoc(collection(db, 'catalog'), { ...bike, createdAt: Date.now() });
+};
+
+export const updateBikeInCatalog = async (id: string, data: Partial<BikeCatalogItem>) => {
+  await updateDoc(doc(db, 'catalog', id), data);
 };
 
 export const removeBikeFromCatalog = async (id: string) => {

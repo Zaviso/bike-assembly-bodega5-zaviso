@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Upload } from 'lucide-react';
-import { getAppData, addBikeToCatalog, removeBikeFromCatalog, type BikeCatalogItem } from '../../store';
+import { ArrowLeft, Trash2, Upload, Edit2 } from 'lucide-react';
+import { getAppData, addBikeToCatalog, removeBikeFromCatalog, updateBikeInCatalog, type BikeCatalogItem } from '../../store';
 import Swal from 'sweetalert2';
 
 export function CatalogManager() {
   const navigate = useNavigate();
   const [catalog, setCatalog] = useState<BikeCatalogItem[]>([]);
   
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
@@ -33,15 +34,49 @@ export function CatalogManager() {
     }
   };
 
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!code || !description) return;
-    
-    await addBikeToCatalog({ code, description, image });
+  const handleEditClick = (bike: BikeCatalogItem) => {
+    setEditingId(bike.id);
+    setCode(bike.code);
+    setDescription(bike.description);
+    setImage(bike.image);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
     setCode('');
     setDescription('');
     setImage('');
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code || !description) return;
+    
+    if (editingId) {
+      await updateBikeInCatalog(editingId, { code, description, image });
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Bicicleta actualizada',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    } else {
+      await addBikeToCatalog({ code, description, image });
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Bicicleta agregada',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+    
+    handleCancelEdit();
     loadCatalog();
   };
 
@@ -61,16 +96,18 @@ export function CatalogManager() {
       await removeBikeFromCatalog(id);
       loadCatalog();
       Swal.fire({
-        title: 'Eliminada',
-        text: 'La bicicleta ha sido eliminada.',
+        toast: true,
+        position: 'top-end',
         icon: 'success',
-        confirmButtonColor: '#ff7043',
+        title: 'Bicicleta eliminada',
+        showConfirmButton: false,
+        timer: 1500
       });
     }
   };
 
   return (
-    <div className="app-container animate-fade-in">
+    <div className="app-container animate-fade-in" style={{ paddingBottom: '3rem' }}>
       <div className="flex-between mb-4">
         <button className="secondary flex-center" onClick={() => navigate('/admin')}>
           <ArrowLeft size={18} style={{ marginRight: '8px' }} />
@@ -79,8 +116,8 @@ export function CatalogManager() {
         <h2 className="text-accent">Catálogo</h2>
       </div>
 
-      <form onSubmit={handleAdd} className="card mb-4">
-        <h3>Agregar Nueva Bicicleta</h3>
+      <form onSubmit={handleSubmit} className="card mb-4">
+        <h3>{editingId ? 'Editar Bicicleta' : 'Agregar Nueva Bicicleta'}</h3>
         <div className="mt-2 mb-2">
           <label>Código</label>
           <input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Ej: BIC-29-PRO" required />
@@ -106,7 +143,16 @@ export function CatalogManager() {
             {image && <img src={image} alt="Preview" style={{ height: '40px', borderRadius: '4px' }} />}
           </div>
         </div>
-        <button type="submit" className="primary" style={{ width: '100%' }}>Guardar Bicicleta</button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          {editingId && (
+            <button type="button" className="secondary" onClick={handleCancelEdit} style={{ flex: 1 }}>
+              Cancelar
+            </button>
+          )}
+          <button type="submit" className="primary" style={{ flex: editingId ? 1 : 'none', width: editingId ? 'auto' : '100%' }}>
+            {editingId ? 'Guardar Cambios' : 'Guardar Bicicleta'}
+          </button>
+        </div>
       </form>
 
       <h3>Bicicletas Registradas</h3>
@@ -124,9 +170,25 @@ export function CatalogManager() {
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{bike.description}</p>
               </div>
             </div>
-            <button className="secondary" style={{ padding: '0.5rem', borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={() => handleRemove(bike.id)}>
-              <Trash2 size={20} />
-            </button>
+            
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button 
+                className="secondary" 
+                style={{ padding: '0.5rem' }} 
+                onClick={() => handleEditClick(bike)}
+                title="Editar"
+              >
+                <Edit2 size={20} />
+              </button>
+              <button 
+                className="secondary" 
+                style={{ padding: '0.5rem', borderColor: 'var(--danger)', color: 'var(--danger)' }} 
+                onClick={() => handleRemove(bike.id)}
+                title="Eliminar"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
