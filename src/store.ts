@@ -45,16 +45,7 @@ export type AppData = {
   logs: LogEntry[];
 };
 
-const DEFAULT_DATA: AppData = {
-  workers: [
-    { id: '1', name: 'Armador 1' },
-    { id: '2', name: 'Armador 2' }
-  ],
-  catalog: [
-    { id: '1', code: 'BIC-MTB-01', description: 'Bicicleta Mountain Bike Aro 29', image: '' }
-  ],
-  logs: []
-};
+
 
 export const getAppData = async (): Promise<AppData> => {
   try {
