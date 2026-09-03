@@ -80,7 +80,7 @@ function GlobalLockScreen({ onUnlock }: { onUnlock: () => void }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin.trim().toUpperCase() === 'BODEGA5') {
+    if (pin.trim().toUpperCase() === 'STORMBOD526') {
       localStorage.setItem('app_unlocked', 'true');
       onUnlock();
     } else {
