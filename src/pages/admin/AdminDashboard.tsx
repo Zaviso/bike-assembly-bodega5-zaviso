@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Bike, FileText, ArrowLeft } from 'lucide-react';
+import { Users, Bike, FileText, ArrowLeft, RefreshCw } from 'lucide-react';
 import { getAppData, type LogEntry, type BikeCatalogItem } from '../../store';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [catalog, setCatalog] = useState<BikeCatalogItem[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
+  const loadData = () => {
+    setIsRefreshing(true);
     getAppData().then(data => {
       setLogs(data.logs);
       setCatalog(data.catalog);
+      setTimeout(() => setIsRefreshing(false), 500); // Pequeño delay visual
     });
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   const bikeLogs = logs.filter(l => l.type === 'bike');
@@ -30,10 +37,20 @@ export function AdminDashboard() {
           <ArrowLeft size={18} style={{ marginRight: '8px' }} />
           Volver
         </button>
-        <h2 className="text-accent">Panel de Administrador</h2>
+        <button 
+          className="secondary flex-center" 
+          onClick={loadData}
+          disabled={isRefreshing}
+          style={{ padding: '0.5rem', borderRadius: '50%' }}
+          title="Actualizar Datos"
+        >
+          <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} style={{ color: 'var(--text-secondary)' }} />
+        </button>
       </div>
 
-      <h3 className="mb-2">Bicicletas Armadas por Código</h3>
+      <div className="flex-between mb-2">
+        <h3>Bicicletas Armadas por Código</h3>
+      </div>
       <div className="grid grid-cols-2 mb-4">
         {Object.entries(bikeCountsByCode).length === 0 ? (
           <p style={{ color: 'var(--text-secondary)', gridColumn: '1 / -1' }}>No hay registros aún.</p>
