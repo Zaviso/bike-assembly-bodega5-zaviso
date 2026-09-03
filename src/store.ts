@@ -95,3 +95,27 @@ export const addWorker = async (name: string) => {
 export const removeWorker = async (id: string) => {
   await deleteDoc(doc(db, 'workers', id));
 };
+
+import { query, where } from 'firebase/firestore';
+
+export const removeLastBikeLog = async (workerId: string, date: string, bikeId: string) => {
+  const q = query(
+    collection(db, 'logs'),
+    where('type', '==', 'bike'),
+    where('workerId', '==', workerId),
+    where('date', '==', date),
+    where('bikeId', '==', bikeId)
+  );
+  
+  const snapshot = await getDocs(q);
+  if (!snapshot.empty) {
+    const docs = snapshot.docs;
+    let latestDoc = docs[0];
+    for (let i = 1; i < docs.length; i++) {
+      if (docs[i].data().timestamp > latestDoc.data().timestamp) {
+        latestDoc = docs[i];
+      }
+    }
+    await deleteDoc(doc(db, 'logs', latestDoc.id));
+  }
+};
