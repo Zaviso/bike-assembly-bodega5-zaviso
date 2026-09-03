@@ -35,7 +35,7 @@ function Home() {
           style={{ flexDirection: 'column', cursor: 'pointer', padding: '3rem 1rem' }}
           onClick={() => {
             const pin = window.prompt('Introduce el PIN de administrador:');
-            if (pin === '1234') {
+            if (pin === 'E.Labra5') {
               navigate('/admin');
             } else if (pin !== null) {
               alert('PIN incorrecto');
