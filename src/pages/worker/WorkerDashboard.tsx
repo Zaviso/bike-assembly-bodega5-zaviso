@@ -21,12 +21,6 @@ export function WorkerDashboard() {
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Seleccionar bicicleta del catálogo</p>
         </div>
 
-        <div className="card interactive flex-center" style={{ flexDirection: 'column', padding: '2rem', cursor: 'pointer' }} onClick={() => navigate('/worker/history')}>
-          <FileText size={48} className="text-accent mb-2" />
-          <h3>Mi Historial</h3>
-          <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Ver trabajos realizados</p>
-        </div>
-
         <div className="card interactive flex-center" style={{ flexDirection: 'column', padding: '2rem', cursor: 'pointer' }} onClick={() => navigate('/worker/furniture')}>
           <Sofa size={48} className="text-accent mb-2" />
           <h3>Armado de Muebles</h3>
@@ -37,6 +31,12 @@ export function WorkerDashboard() {
           <Warehouse size={48} className="text-accent mb-2" />
           <h3>Chambas fuera de la 5</h3>
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Registrar horas y tareas</p>
+        </div>
+        
+        <div className="card interactive flex-center" style={{ flexDirection: 'column', padding: '2rem', cursor: 'pointer' }} onClick={() => navigate('/worker/history')}>
+          <FileText size={48} className="text-accent mb-2" />
+          <h3>Mi Historial</h3>
+          <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Ver trabajos realizados</p>
         </div>
       </div>
     </div>

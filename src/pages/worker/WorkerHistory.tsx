@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, Folder } from 'lucide-react';
 import { getAppData, type BikeCatalogItem, type Worker, type LogEntry } from '../../store';
 
 export function WorkerHistory() {
@@ -10,7 +10,11 @@ export function WorkerHistory() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   
   const [selectedWorker, setSelectedWorker] = useState(localStorage.getItem('lastSelectedWorker') || '');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  
+  // Accordion states
+  const [expandedYears, setExpandedYears] = useState<Record<string, boolean>>({});
+  const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     getAppData().then(data => {
@@ -26,18 +30,32 @@ export function WorkerHistory() {
     localStorage.setItem('lastSelectedWorker', val);
   };
 
-  // Filtrar logs
-  const myLogs = logs.filter(l => l.type === 'bike' && l.workerId === selectedWorker && l.date === date);
-  
-  // Agrupar por bicicleta
-  const bikeCounts = myLogs.reduce((acc, curr) => {
-    const bike = catalog.find(b => b.id === curr.bikeId);
-    const code = bike ? bike.code : 'Desconocido';
-    acc[code] = (acc[code] || 0) + (curr.quantity || 1);
-    return acc;
-  }, {} as Record<string, number>);
+  const toggleYear = (year: string) => setExpandedYears(prev => ({ ...prev, [year]: !prev[year] }));
+  const toggleMonth = (monthKey: string) => setExpandedMonths(prev => ({ ...prev, [monthKey]: !prev[monthKey] }));
+  const toggleDay = (dayKey: string) => setExpandedDays(prev => ({ ...prev, [dayKey]: !prev[dayKey] }));
 
-  const totalBikes = Object.values(bikeCounts).reduce((a, b) => a + b, 0);
+  const myLogs = logs.filter(l => l.type === 'bike' && l.workerId === selectedWorker);
+  
+  // Grouping logic
+  const grouped: Record<string, Record<string, Record<string, Record<string, number>>>> = {};
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+  myLogs.forEach(log => {
+    const [year, monthNum] = log.date.split('-');
+    const monthName = monthNames[parseInt(monthNum) - 1];
+
+    const bike = catalog.find(b => b.id === log.bikeId);
+    const code = bike ? bike.code : 'Desconocido';
+
+    if (!grouped[year]) grouped[year] = {};
+    if (!grouped[year][monthName]) grouped[year][monthName] = {};
+    if (!grouped[year][monthName][log.date]) grouped[year][monthName][log.date] = {};
+    
+    if (!grouped[year][monthName][log.date][code]) {
+      grouped[year][monthName][log.date][code] = 0;
+    }
+    grouped[year][monthName][log.date][code] += (log.quantity || 1);
+  });
 
   return (
     <div className="app-container animate-fade-in">
@@ -59,11 +77,6 @@ export function WorkerHistory() {
             ))}
           </select>
         </div>
-
-        <div>
-          <label>Fecha del Historial</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-        </div>
       </div>
 
       {!selectedWorker ? (
@@ -71,33 +84,87 @@ export function WorkerHistory() {
           Selecciona tu nombre para ver tu historial.
         </div>
       ) : (
-        <div className="card">
-          <div className="flex-between mb-4" style={{ borderBottom: '1px solid #333', paddingBottom: '1rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Calendar size={20} className="text-accent" />
-              Resumen del Día
-            </h3>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Total Armadas</span>
-              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: 'var(--accent-orange)' }}>{totalBikes}</p>
-            </div>
-          </div>
-
-          {Object.entries(bikeCounts).length === 0 ? (
+        <div>
+          {Object.keys(grouped).length === 0 ? (
             <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
-              No hay bicicletas registradas en esta fecha.
+              No hay bicicletas registradas en tu historial.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {Object.entries(bikeCounts)
-                .sort(([codeA], [codeB]) => codeA.localeCompare(codeB, undefined, { numeric: true }))
-                .map(([code, count]) => (
-                <div key={code} className="flex-between" style={{ backgroundColor: '#2a2a2a', padding: '1rem', borderRadius: '4px' }}>
-                  <span style={{ fontWeight: '500' }}>{code}</span>
-                  <span style={{ fontWeight: 'bold', color: 'var(--accent-orange)' }}>{count} u.</span>
+            Object.keys(grouped).sort((a, b) => b.localeCompare(a)).map(year => (
+              <div key={year} style={{ marginBottom: '0.5rem' }}>
+                <div 
+                  className="card flex-between interactive" 
+                  style={{ padding: '1rem', cursor: 'pointer', backgroundColor: 'var(--bg-card)', marginBottom: '2px' }}
+                  onClick={() => toggleYear(year)}
+                >
+                  <div className="flex-center">
+                    <Folder className="text-accent" size={20} style={{ marginRight: '10px' }} />
+                    <strong style={{ fontSize: '1.2rem' }}>Año {year}</strong>
+                  </div>
+                  {expandedYears[year] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                 </div>
-              ))}
-            </div>
+
+                {expandedYears[year] && (
+                  <div style={{ marginLeft: '1rem', borderLeft: '2px solid var(--border-color)', paddingLeft: '0.5rem' }}>
+                    {Object.keys(grouped[year]).map(month => {
+                      const monthKey = `${year}-${month}`;
+                      return (
+                        <div key={monthKey} style={{ marginTop: '0.5rem' }}>
+                          <div 
+                            className="flex-between interactive" 
+                            style={{ padding: '0.8rem', cursor: 'pointer', backgroundColor: '#2a2a2a', borderRadius: '4px' }}
+                            onClick={() => toggleMonth(monthKey)}
+                          >
+                            <div className="flex-center">
+                              <Folder style={{ color: 'var(--accent-yellow)', marginRight: '10px' }} size={18} />
+                              <span style={{ fontWeight: 'bold' }}>{month}</span>
+                            </div>
+                            {expandedMonths[monthKey] ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                          </div>
+
+                          {expandedMonths[monthKey] && (
+                            <div style={{ marginLeft: '1rem', borderLeft: '2px solid var(--border-color)', paddingLeft: '0.5rem' }}>
+                              {Object.keys(grouped[year][month]).sort((a, b) => b.localeCompare(a)).map(date => {
+                                const dayKey = `${year}-${month}-${date}`;
+                                const totalDayBikes = Object.values(grouped[year][month][date]).reduce((a, b) => a + b, 0);
+                                
+                                return (
+                                  <div key={dayKey} style={{ marginTop: '0.5rem' }}>
+                                    <div 
+                                      className="flex-between interactive" 
+                                      style={{ padding: '0.6rem', cursor: 'pointer', backgroundColor: 'var(--bg-dark)', borderRadius: '4px' }}
+                                      onClick={() => toggleDay(dayKey)}
+                                    >
+                                      <span>Fecha: <strong style={{ color: 'var(--text-primary)' }}>{date}</strong></span>
+                                      <span style={{ color: 'var(--accent-orange)', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                                        {totalDayBikes} bicis {expandedDays[dayKey] ? <ChevronDown size={16} style={{ verticalAlign: 'middle' }} /> : <ChevronRight size={16} style={{ verticalAlign: 'middle' }} />}
+                                      </span>
+                                    </div>
+
+                                    {expandedDays[dayKey] && (
+                                      <div style={{ padding: '0.5rem 1rem', backgroundColor: '#1e1e1e', borderRadius: '0 0 4px 4px', fontSize: '0.9rem' }}>
+                                        {Object.entries(grouped[year][month][date])
+                                          .sort(([codeA], [codeB]) => codeA.localeCompare(codeB, undefined, { numeric: true }))
+                                          .map(([code, count]) => (
+                                          <div key={code} className="flex-between" style={{ padding: '4px 0', borderBottom: '1px dashed #333' }}>
+                                            <span style={{ color: 'var(--text-secondary)' }}>{code}</span>
+                                            <strong style={{ color: 'var(--text-primary)' }}>{count} u.</strong>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
       )}
