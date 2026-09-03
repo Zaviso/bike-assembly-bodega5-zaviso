@@ -132,8 +132,7 @@ export function LogsViewer() {
         </div>
       </div>
 
-      <h3 className="mb-2">Historial Estructurado</h3>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>Navega por las carpetas para ver los registros sin sobrecargar la pantalla.</p>
+      <h3 className="mb-4">Historial de Registros</h3>
 
       {Object.keys(grouped).length === 0 ? (
         <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
