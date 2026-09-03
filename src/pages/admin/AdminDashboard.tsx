@@ -8,6 +8,7 @@ export function AdminDashboard() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [catalog, setCatalog] = useState<BikeCatalogItem[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const loadData = () => {
     setIsRefreshing(true);
@@ -22,7 +23,7 @@ export function AdminDashboard() {
     loadData();
   }, []);
 
-  const bikeLogs = logs.filter(l => l.type === 'bike');
+  const bikeLogs = logs.filter(l => l.type === 'bike' && l.date === selectedDate);
   const bikeCountsByCode = bikeLogs.reduce((acc, curr) => {
     const bike = catalog.find(b => b.id === curr.bikeId);
     const code = bike ? bike.code : 'Desconocido';
@@ -49,7 +50,13 @@ export function AdminDashboard() {
       </div>
 
       <div className="flex-between mb-2">
-        <h3>Bicicletas Armadas por Código</h3>
+        <h3 style={{ margin: 0 }}>Bicicletas Armadas</h3>
+        <input 
+          type="date" 
+          value={selectedDate} 
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={{ padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#2a2a2a', color: 'white' }}
+        />
       </div>
       <div className="grid grid-cols-2 mb-4">
         {Object.entries(bikeCountsByCode).length === 0 ? (

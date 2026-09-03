@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Bike, Sofa, Warehouse, ArrowLeft } from 'lucide-react';
+import { Bike, Sofa, Warehouse, ArrowLeft, FileText } from 'lucide-react';
 
 export function WorkerDashboard() {
   const navigate = useNavigate();
@@ -19,6 +19,12 @@ export function WorkerDashboard() {
           <Bike size={48} className="text-accent mb-2" />
           <h3>Armado de Bicicletas</h3>
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Seleccionar bicicleta del catálogo</p>
+        </div>
+
+        <div className="card interactive flex-center" style={{ flexDirection: 'column', padding: '2rem', cursor: 'pointer' }} onClick={() => navigate('/worker/history')}>
+          <FileText size={48} className="text-accent mb-2" />
+          <h3>Mi Historial</h3>
+          <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Ver trabajos realizados</p>
         </div>
 
         <div className="card interactive flex-center" style={{ flexDirection: 'column', padding: '2rem', cursor: 'pointer' }} onClick={() => navigate('/worker/furniture')}>

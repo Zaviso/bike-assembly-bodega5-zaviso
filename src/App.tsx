@@ -3,6 +3,7 @@ import { WorkerDashboard } from './pages/worker/WorkerDashboard';
 import { BikeForm } from './pages/worker/BikeForm';
 import { FurnitureForm } from './pages/worker/FurnitureForm';
 import { WarehouseForm } from './pages/worker/WarehouseForm';
+import { WorkerHistory } from './pages/worker/WorkerHistory';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { CatalogManager } from './pages/admin/CatalogManager';
 import { TeamManager } from './pages/admin/TeamManager';
@@ -83,6 +84,7 @@ function App() {
         {/* Worker Routes */}
         <Route path="/worker" element={<WorkerDashboard />} />
         <Route path="/worker/bike" element={<BikeForm />} />
+        <Route path="/worker/history" element={<WorkerHistory />} />
         <Route path="/worker/furniture" element={<FurnitureForm />} />
         <Route path="/worker/warehouse" element={<WarehouseForm />} />
 
