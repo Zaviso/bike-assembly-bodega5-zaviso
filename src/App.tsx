@@ -8,8 +8,9 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { CatalogManager } from './pages/admin/CatalogManager';
 import { TeamManager } from './pages/admin/TeamManager';
 import { LogsViewer } from './pages/admin/LogsViewer';
-import { Wrench, Settings } from 'lucide-react';
+import { Wrench, Settings, Lock } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { useState, useEffect } from 'react';
 
 function Home() {
   const navigate = useNavigate();
@@ -73,7 +74,60 @@ function Home() {
   );
 }
 
+function GlobalLockScreen({ onUnlock }: { onUnlock: () => void }) {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pin.trim().toUpperCase() === 'BODEGA5') {
+      localStorage.setItem('app_unlocked', 'true');
+      onUnlock();
+    } else {
+      setError(true);
+      setPin('');
+    }
+  };
+
+  return (
+    <div className="app-container flex-center animate-fade-in" style={{ height: '100vh', flexDirection: 'column' }}>
+      <Lock size={64} className="text-accent mb-4" />
+      <h1 style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '1rem' }}>Acceso Privado</h1>
+      <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2rem', maxWidth: '400px' }}>
+        Esta aplicación es de uso exclusivo para el equipo de Bodega 5. Ingresa la clave de acceso para continuar.
+      </p>
+
+      <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '300px' }} className="flex-center flex-col">
+        <input 
+          type="password" 
+          value={pin}
+          onChange={(e) => { setPin(e.target.value); setError(false); }}
+          placeholder="Clave de acceso"
+          style={{ width: '100%', marginBottom: '1rem', textAlign: 'center', letterSpacing: '2px', fontSize: '1.2rem', padding: '0.8rem' }}
+        />
+        {error && <p style={{ color: 'var(--danger)', marginBottom: '1rem', fontSize: '0.9rem' }}>Clave incorrecta</p>}
+        <button type="submit" className="primary" style={{ width: '100%' }}>Desbloquear</button>
+      </form>
+    </div>
+  );
+}
+
 function App() {
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unlocked = localStorage.getItem('app_unlocked') === 'true';
+    setIsUnlocked(unlocked);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) return null;
+
+  if (!isUnlocked) {
+    return <GlobalLockScreen onUnlock={() => setIsUnlocked(true)} />;
+  }
+
   return (
     <BrowserRouter>
       <div style={{ position: 'fixed', bottom: '10px', right: '10px', color: 'var(--text-secondary)', opacity: 0.7, fontSize: '0.8rem', zIndex: 1000, pointerEvents: 'none' }}>
