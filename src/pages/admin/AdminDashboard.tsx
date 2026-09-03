@@ -66,7 +66,7 @@ export function AdminDashboard() {
             .sort(([codeA], [codeB]) => codeA.localeCompare(codeB, undefined, { numeric: true, sensitivity: 'base' }))
             .map(([code, count]) => (
             <div key={code} className="card" style={{ borderLeft: '4px solid var(--accent-orange)' }}>
-              <h4 style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{code}</h4>
+              <h4 style={{ color: 'var(--accent-orange)', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{code}</h4>
               <p style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{count}</p>
             </div>
           ))

@@ -15,7 +15,8 @@ function Home() {
   const navigate = useNavigate();
   return (
     <div className="app-container flex-center animate-fade-in" style={{ height: '100vh', flexDirection: 'column' }}>
-      <h1 className="mb-4 text-accent" style={{ fontSize: '2.5rem', textAlign: 'center' }}>
+      <h1 className="mb-4 text-accent" style={{ fontSize: '2.5rem', textAlign: 'center', lineHeight: '1.2' }}>
+        <span style={{ fontSize: '1.5rem', color: 'var(--text-secondary)' }}>BODEGA 5</span><br/>
         TRACKER DE ARMADO
       </h1>
       
