@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, UserPlus } from 'lucide-react';
 import { getAppData, addWorker, removeWorker, type Worker } from '../../store';
+import Swal from 'sweetalert2';
 
 export function TeamManager() {
   const navigate = useNavigate();
@@ -25,9 +26,26 @@ export function TeamManager() {
   };
 
   const handleRemove = async (id: string) => {
-    if (confirm('¿Seguro que deseas eliminar a este armador?')) {
+    const result = await Swal.fire({
+      title: '¿Eliminar armador?',
+      text: '¿Seguro que deseas eliminar a este armador?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#444',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
       await removeWorker(id);
       loadWorkers();
+      Swal.fire({
+        title: 'Eliminado',
+        text: 'El armador ha sido eliminado.',
+        icon: 'success',
+        confirmButtonColor: '#ff7043',
+      });
     }
   };
 

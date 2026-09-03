@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, Upload } from 'lucide-react';
 import { getAppData, addBikeToCatalog, removeBikeFromCatalog, type BikeCatalogItem } from '../../store';
+import Swal from 'sweetalert2';
 
 export function CatalogManager() {
   const navigate = useNavigate();
@@ -45,9 +46,26 @@ export function CatalogManager() {
   };
 
   const handleRemove = async (id: string) => {
-    if (confirm('¿Seguro que deseas eliminar esta bicicleta?')) {
+    const result = await Swal.fire({
+      title: '¿Eliminar bicicleta?',
+      text: '¿Seguro que deseas eliminar esta bicicleta del catálogo?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#444',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
       await removeBikeFromCatalog(id);
       loadCatalog();
+      Swal.fire({
+        title: 'Eliminada',
+        text: 'La bicicleta ha sido eliminada.',
+        icon: 'success',
+        confirmButtonColor: '#ff7043',
+      });
     }
   };
 

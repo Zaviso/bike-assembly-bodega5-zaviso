@@ -8,6 +8,7 @@ import { CatalogManager } from './pages/admin/CatalogManager';
 import { TeamManager } from './pages/admin/TeamManager';
 import { LogsViewer } from './pages/admin/LogsViewer';
 import { Wrench, Settings } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 function Home() {
   const navigate = useNavigate();
@@ -33,12 +34,29 @@ function Home() {
         <div 
           className="card interactive flex-center" 
           style={{ flexDirection: 'column', cursor: 'pointer', padding: '3rem 1rem' }}
-          onClick={() => {
-            const pin = window.prompt('Introduce el PIN de administrador:');
-            if (pin === 'E.Labra5') {
-              navigate('/admin');
-            } else if (pin !== null) {
-              alert('PIN incorrecto');
+          onClick={async () => {
+            const { value: pin } = await Swal.fire({
+              title: 'Acceso Restringido',
+              input: 'password',
+              inputLabel: 'Introduce el PIN de administrador',
+              inputPlaceholder: 'PIN',
+              showCancelButton: true,
+              confirmButtonText: 'Entrar',
+              cancelButtonText: 'Cancelar',
+              confirmButtonColor: '#ff7043',
+            });
+            
+            if (pin) {
+              if (pin === 'E.Labra5') {
+                navigate('/admin');
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Acceso denegado',
+                  text: 'PIN incorrecto',
+                  confirmButtonColor: '#ff7043',
+                });
+              }
             }
           }}
         >

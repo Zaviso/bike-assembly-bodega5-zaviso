@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getAppData, type LogEntry, type Worker, type BikeCatalogItem } from '../../store';
+import Swal from 'sweetalert2';
 
 export function LogsViewer() {
   const navigate = useNavigate();
@@ -48,7 +49,12 @@ export function LogsViewer() {
     const workerLogs = logs.filter(l => l.workerId === workerId);
     
     if (workerLogs.length === 0) {
-      alert('No hay registros para este armador.');
+      Swal.fire({
+        icon: 'info',
+        title: 'Sin registros',
+        text: 'No hay registros para este armador.',
+        confirmButtonColor: '#ff7043',
+      });
       return;
     }
 
