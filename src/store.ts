@@ -61,7 +61,9 @@ export const getAppData = async (): Promise<AppData> => {
 
     // Ordenar por fecha de creación en el cliente para no ocultar los que no tienen createdAt
     workers.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-    catalog.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    
+    // Ordenar catálogo por código numéricamente/alfabéticamente
+    catalog.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: 'base' }));
 
     return { workers, catalog, logs };
   } catch (error) {
