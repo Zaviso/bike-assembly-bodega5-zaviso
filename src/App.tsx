@@ -33,7 +33,14 @@ function Home() {
         <div 
           className="card interactive flex-center" 
           style={{ flexDirection: 'column', cursor: 'pointer', padding: '3rem 1rem' }}
-          onClick={() => navigate('/admin')}
+          onClick={() => {
+            const pin = window.prompt('Introduce el PIN de administrador:');
+            if (pin === '1234') {
+              navigate('/admin');
+            } else if (pin !== null) {
+              alert('PIN incorrecto');
+            }
+          }}
         >
           <Settings size={48} className="text-accent mb-2" />
           <h2>Administrador</h2>
