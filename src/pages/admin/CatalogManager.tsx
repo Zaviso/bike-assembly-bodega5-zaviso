@@ -189,9 +189,9 @@ export function CatalogManager() {
           <div key={bike.id} className="card flex-between" style={{ padding: '1rem' }}>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               {bike.image ? (
-                <img src={bike.image} alt={bike.code} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
+                <img src={bike.image} alt={bike.code} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
               ) : (
-                <div style={{ width: '60px', height: '60px', backgroundColor: 'var(--bg-dark)', borderRadius: '8px' }} />
+                <div style={{ width: '60px', height: '60px', backgroundColor: 'var(--bg-dark)', borderRadius: '8px', flexShrink: 0 }} />
               )}
               <div>
                 <strong style={{ fontSize: '1.1rem' }}>{bike.code}</strong>
