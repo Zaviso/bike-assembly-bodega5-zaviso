@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, FileText, ChevronDown, ChevronRight, Folder } from 'lucide-react';
+import { ArrowLeft, Download, FileText, ChevronDown, ChevronRight, Folder, Trash2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getAppData, type LogEntry, type Worker, type BikeCatalogItem } from '../../store';
+import { getAppData, type LogEntry, type Worker, type BikeCatalogItem, removeLog } from '../../store';
 import Swal from 'sweetalert2';
 
 export function LogsViewer() {
@@ -31,6 +31,32 @@ export function LogsViewer() {
 
   const toggleYear = (year: string) => setExpandedYears(prev => ({ ...prev, [year]: !prev[year] }));
   const toggleMonth = (monthKey: string) => setExpandedMonths(prev => ({ ...prev, [monthKey]: !prev[monthKey] }));
+
+  const handleRemoveLog = async (id: string) => {
+    const result = await Swal.fire({
+      title: '¿Eliminar registro?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#444',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      await removeLog(id);
+      setLogs(prevLogs => prevLogs.filter(l => l.id !== id));
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Registro eliminado',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+  };
 
   // Agrupar logs para la vista de carpetas (Año -> Mes -> Logs[])
   const grouped: Record<string, Record<string, LogEntry[]>> = {};
@@ -186,6 +212,7 @@ export function LogsViewer() {
                                 <th style={{ padding: '12px' }}>Armador</th>
                                 <th style={{ padding: '12px' }}>Tipo</th>
                                 <th style={{ padding: '12px' }}>Detalle</th>
+                                <th style={{ padding: '12px' }}></th>
                               </tr>
                             </thead>
                             <tbody>
@@ -208,6 +235,16 @@ export function LogsViewer() {
                                     {log.type === 'bike' && `Bici: ${getBikeCode(log.bikeId!)} (x${log.quantity})`}
                                     {log.type === 'furniture' && `Mueble: ${log.furnitureCode} (x${log.quantity})`}
                                     {log.type === 'warehouse' && `Bodega: ${log.warehouseName} (${log.startTime} a ${log.endTime})`}
+                                  </td>
+                                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                                    <button 
+                                      className="secondary" 
+                                      style={{ padding: '0.4rem', borderColor: 'var(--danger)', color: 'var(--danger)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} 
+                                      onClick={() => handleRemoveLog(log.id)}
+                                      title="Eliminar registro"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
                                   </td>
                                 </tr>
                               ))}

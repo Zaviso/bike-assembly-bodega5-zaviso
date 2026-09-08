@@ -100,6 +100,10 @@ export const removeWorker = async (id: string) => {
   await deleteDoc(doc(db, 'workers', id));
 };
 
+export const removeLog = async (id: string) => {
+  await deleteDoc(doc(db, 'logs', id));
+};
+
 import { query, where } from 'firebase/firestore';
 
 export const removeLastBikeLog = async (workerId: string, date: string, bikeId: string) => {
