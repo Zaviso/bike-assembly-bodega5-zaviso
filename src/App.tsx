@@ -130,8 +130,30 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div style={{ position: 'fixed', bottom: '10px', right: '10px', color: 'var(--text-secondary)', opacity: 0.7, fontSize: '0.8rem', zIndex: 1000, pointerEvents: 'none' }}>
-        Hecho por Saviso
+      <div style={{ 
+        position: 'fixed', 
+        bottom: 0, 
+        left: 0, 
+        right: 0,
+        padding: '16px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
+        color: 'var(--text-secondary)',
+        fontSize: '0.85rem',
+        fontWeight: 500,
+        zIndex: 1000, 
+        pointerEvents: 'none',
+        gap: '8px'
+      }}>
+        <span>Hecho por</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ff7043', fontWeight: 800, letterSpacing: '1px' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 12h4l3-9 5 18 3-9h5"/>
+          </svg>
+          SAVISO
+        </div>
       </div>
       <Routes>
         <Route path="/" element={<Home />} />

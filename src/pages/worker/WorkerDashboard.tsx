@@ -29,7 +29,7 @@ export function WorkerDashboard() {
 
         <div className="card interactive flex-center" style={{ flexDirection: 'column', padding: '2rem', cursor: 'pointer' }} onClick={() => navigate('/worker/warehouse')}>
           <Warehouse size={48} className="text-accent mb-2" />
-          <h3>Chambas fuera de la 5</h3>
+          <h3>Chambas aparte</h3>
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Registrar horas y tareas</p>
         </div>
         

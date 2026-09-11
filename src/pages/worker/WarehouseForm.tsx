@@ -49,7 +49,7 @@ export function WarehouseForm() {
           <ArrowLeft size={18} style={{ marginRight: '8px' }} />
           Atrás
         </button>
-        <h2 className="text-accent">Bodega</h2>
+        <h2 className="text-accent">Chambas Aparte</h2>
       </div>
 
       {success ? (
@@ -88,7 +88,18 @@ export function WarehouseForm() {
 
           <div className="mb-2">
             <label>Nombre de Bodega / Lugar</label>
-            <input type="text" value={warehouseName} onChange={(e) => setWarehouseName(e.target.value)} placeholder="EJEMPLO: CDM" required />
+            <input 
+              type="text" 
+              list="warehouse-options" 
+              value={warehouseName} 
+              onChange={(e) => setWarehouseName(e.target.value)} 
+              placeholder="EJEMPLO: Bodega 5, CDM..." 
+              required 
+            />
+            <datalist id="warehouse-options">
+              <option value="Bodega 5" />
+              <option value="CDM" />
+            </datalist>
           </div>
 
           <div className="mb-4">
