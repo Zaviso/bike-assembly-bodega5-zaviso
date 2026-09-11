@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 function Home() {
   const navigate = useNavigate();
   return (
-    <div className="app-container flex-center animate-fade-in" style={{ height: '100vh', flexDirection: 'column' }}>
+    <div className="app-container flex-center animate-fade-in" style={{ minHeight: '100vh', flexDirection: 'column' }}>
       <h1 className="mb-4 text-accent" style={{ fontSize: '2.5rem', textAlign: 'center', lineHeight: '1.2' }}>
         <span style={{ fontSize: '1.5rem', color: 'var(--text-secondary)' }}>BODEGA 5</span><br/>
         TRACKER DE ARMADO
@@ -90,7 +90,7 @@ function GlobalLockScreen({ onUnlock }: { onUnlock: () => void }) {
   };
 
   return (
-    <div className="app-container flex-center animate-fade-in" style={{ height: '100vh', flexDirection: 'column' }}>
+    <div className="app-container flex-center animate-fade-in" style={{ minHeight: '100vh', flexDirection: 'column' }}>
       <Lock size={64} className="text-accent mb-4" />
       <h1 style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '1rem' }}>Acceso Privado</h1>
       <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '2rem', maxWidth: '400px' }}>
