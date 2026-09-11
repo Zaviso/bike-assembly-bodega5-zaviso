@@ -130,6 +130,21 @@ function App() {
 
   return (
     <BrowserRouter>
+      <div style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: 0.05,
+      }}>
+        <img src="/2.png" alt="Zaviso Watermark" style={{ width: '50vw', maxWidth: '400px', objectFit: 'contain', marginBottom: '2rem' }} />
+        <h2 style={{ fontSize: '3rem', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '4px', margin: 0 }}>Hecho por Saviso</h2>
+      </div>
+
       <div style={{ 
         position: 'fixed', 
         bottom: 0, 
@@ -148,12 +163,7 @@ function App() {
         gap: '8px'
       }}>
         <span>Hecho por</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ff7043', fontWeight: 800, letterSpacing: '1px' }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2 12h4l3-9 5 18 3-9h5"/>
-          </svg>
-          SAVISO
-        </div>
+        <img src="/1.png" alt="Saviso" style={{ height: '20px', objectFit: 'contain', marginLeft: '4px' }} />
       </div>
       <Routes>
         <Route path="/" element={<Home />} />
