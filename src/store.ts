@@ -14,6 +14,7 @@ export type BikeCatalogItem = {
   description: string;
   image: string; // Base64 or URL
   receivedQuantity?: number; // Total boxes arrived/received
+  damagedQuantity?: number; // Total damaged/defective bikes (Servicio Técnico)
   createdAt?: number;
 };
 
@@ -105,6 +106,10 @@ export const removeWorker = async (id: string) => {
 
 export const removeLog = async (id: string) => {
   await deleteDoc(doc(db, 'logs', id));
+};
+
+export const updateLog = async (id: string, data: Partial<LogEntry>) => {
+  await updateDoc(doc(db, 'logs', id), data);
 };
 
 import { query, where } from 'firebase/firestore';

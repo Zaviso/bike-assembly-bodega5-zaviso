@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, FileText, ChevronDown, ChevronRight, Folder, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, FileText, ChevronDown, ChevronRight, Folder, Trash2, Edit2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getAppData, type LogEntry, type Worker, type BikeCatalogItem, removeLog } from '../../store';
+import { getAppData, type LogEntry, type Worker, type BikeCatalogItem, removeLog, updateLog } from '../../store';
 import Swal from 'sweetalert2';
 
 export function LogsViewer() {
@@ -33,27 +33,95 @@ export function LogsViewer() {
   const toggleMonth = (monthKey: string) => setExpandedMonths(prev => ({ ...prev, [monthKey]: !prev[monthKey] }));
 
   const handleRemoveLog = async (id: string) => {
-    const result = await Swal.fire({
-      title: '¿Eliminar registro?',
-      text: 'Esta acción no se puede deshacer.',
-      icon: 'warning',
+    const { value: pin } = await Swal.fire({
+      title: 'Acceso Restringido',
+      input: 'password',
+      inputLabel: 'Introduce el PIN para eliminar',
+      inputPlaceholder: 'PIN',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#444',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: 'Continuar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ef4444',
     });
 
-    if (result.isConfirmed) {
-      await removeLog(id);
-      setLogs(prevLogs => prevLogs.filter(l => l.id !== id));
+    if (pin === 'E.Labra5') {
+      const result = await Swal.fire({
+        title: '¿Eliminar registro?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#444',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      });
+
+      if (result.isConfirmed) {
+        await removeLog(id);
+        setLogs(prevLogs => prevLogs.filter(l => l.id !== id));
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Registro eliminado',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    } else if (pin) {
       Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Registro eliminado',
-        showConfirmButton: false,
-        timer: 1500
+        icon: 'error',
+        title: 'Acceso denegado',
+        text: 'PIN incorrecto',
+        confirmButtonColor: '#ef4444',
+      });
+    }
+  };
+
+  const handleEditLog = async (log: LogEntry) => {
+    const { value: pin } = await Swal.fire({
+      title: 'Acceso Restringido',
+      input: 'password',
+      inputLabel: 'Introduce el PIN para editar',
+      inputPlaceholder: 'PIN',
+      showCancelButton: true,
+      confirmButtonText: 'Continuar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#f97316',
+    });
+
+    if (pin === 'E.Labra5') {
+      if (log.type === 'bike' || log.type === 'furniture') {
+        const { value: newQuantity } = await Swal.fire({
+          title: 'Editar Cantidad',
+          input: 'number',
+          inputValue: log.quantity?.toString(),
+          showCancelButton: true,
+          confirmButtonText: 'Guardar',
+          cancelButtonText: 'Cancelar'
+        });
+
+        if (newQuantity && !isNaN(Number(newQuantity)) && Number(newQuantity) > 0) {
+          await updateLog(log.id, { quantity: Number(newQuantity) });
+          setLogs(prev => prev.map(l => l.id === log.id ? { ...l, quantity: Number(newQuantity) } : l));
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Registro actualizado',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      } else {
+        Swal.fire('Edición no disponible', 'Por el momento solo se puede editar la cantidad de bicis o muebles.', 'info');
+      }
+    } else if (pin) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Acceso denegado',
+        text: 'PIN incorrecto',
+        confirmButtonColor: '#f97316',
       });
     }
   };
@@ -236,7 +304,15 @@ export function LogsViewer() {
                                     {log.type === 'furniture' && `Mueble: ${log.furnitureCode} (x${log.quantity})`}
                                     {log.type === 'warehouse' && `Bodega: ${log.warehouseName} (${log.startTime} a ${log.endTime})`}
                                   </td>
-                                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                                  <td style={{ padding: '12px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                    <button 
+                                      className="secondary" 
+                                      style={{ padding: '0.4rem', borderColor: 'var(--accent-teal)', color: 'var(--accent-teal)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginRight: '8px' }} 
+                                      onClick={() => handleEditLog(log)}
+                                      title="Editar registro"
+                                    >
+                                      <Edit2 size={16} />
+                                    </button>
                                     <button 
                                       className="secondary" 
                                       style={{ padding: '0.4rem', borderColor: 'var(--danger)', color: 'var(--danger)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} 

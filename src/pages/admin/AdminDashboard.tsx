@@ -61,14 +61,15 @@ export function AdminDashboard() {
     
     const tableData = catalog.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true })).map(bike => {
       const received = bike.receivedQuantity || 0;
+      const damaged = bike.damagedQuantity || 0;
       const assembled = allTimeBikeCounts[bike.code] || 0;
-      const remaining = received - assembled;
-      return [bike.code, received, assembled, remaining];
+      const remaining = received - assembled - damaged;
+      return [bike.code, received, assembled, damaged, remaining];
     });
 
     autoTable(doc, {
       startY: 30,
-      head: [['Código', 'Recibidas (Cajas)', 'Armadas Totales', 'Físico Esperado']],
+      head: [['Código', 'Recibidas (Cajas)', 'Armadas Totales', 'Serv. Tec.', 'Físico Esperado']],
       body: tableData,
     });
 
@@ -164,20 +165,23 @@ export function AdminDashboard() {
               <th style={{ padding: '12px' }}>Código</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Recibidas (Cajas)</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Armadas Totales</th>
+              <th style={{ padding: '12px', textAlign: 'center', color: 'var(--danger)' }}>Serv. Téc.</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Físico Esperado</th>
             </tr>
           </thead>
           <tbody>
             {catalog.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true })).map(bike => {
               const received = bike.receivedQuantity || 0;
+              const damaged = bike.damagedQuantity || 0;
               const assembled = allTimeBikeCounts[bike.code] || 0;
-              const remaining = received - assembled;
+              const remaining = received - assembled - damaged;
               
               return (
                 <tr key={bike.id} style={{ borderTop: '1px solid var(--border-color)' }}>
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{bike.code}</td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>{received}</td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>{assembled}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', color: 'var(--danger)' }}>{damaged}</td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>
                     <span style={{ 
                       fontWeight: 'bold', 
