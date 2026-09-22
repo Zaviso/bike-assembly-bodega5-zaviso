@@ -34,27 +34,46 @@ export function WorkerHistory() {
   const toggleMonth = (monthKey: string) => setExpandedMonths(prev => ({ ...prev, [monthKey]: !prev[monthKey] }));
   const toggleDay = (dayKey: string) => setExpandedDays(prev => ({ ...prev, [dayKey]: !prev[dayKey] }));
 
-  const myLogs = logs.filter(l => l.type === 'bike' && l.workerId === selectedWorker);
+  const myLogs = logs.filter(l => l.workerId === selectedWorker);
   
   // Grouping logic
-  const grouped: Record<string, Record<string, Record<string, Record<string, number>>>> = {};
+  const grouped: Record<string, Record<string, Record<string, Record<string, { label: string; count: number; type: string; details?: string }>>>> = {};
   const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
   myLogs.forEach(log => {
     const [year, monthNum] = log.date.split('-');
     const monthName = monthNames[parseInt(monthNum) - 1];
 
-    const bike = catalog.find(b => b.id === log.bikeId);
-    const code = bike ? bike.code : 'Desconocido';
+    let key = '';
+    let label = '';
+    let details = '';
+
+    if (log.type === 'bike') {
+      const bike = catalog.find(b => b.id === log.bikeId);
+      key = `bike_${log.bikeId || log.id}`;
+      label = bike ? bike.code : 'Bici Desconocida';
+    } else if (log.type === 'furniture') {
+      key = `furn_${log.furnitureCode || log.id}`;
+      label = `[Mueble] ${log.furnitureCode || 'Desconocido'}`;
+    } else if (log.type === 'warehouse') {
+      key = `wh_${log.id}`;
+      label = `[${log.warehouseName || 'Bodega'}] ${log.description || 'Chamba'}`;
+      if (log.startTime && log.endTime) {
+        details = `${log.startTime} - ${log.endTime}`;
+      }
+    } else {
+      key = `other_${log.id}`;
+      label = 'Otro';
+    }
 
     if (!grouped[year]) grouped[year] = {};
     if (!grouped[year][monthName]) grouped[year][monthName] = {};
     if (!grouped[year][monthName][log.date]) grouped[year][monthName][log.date] = {};
     
-    if (!grouped[year][monthName][log.date][code]) {
-      grouped[year][monthName][log.date][code] = 0;
+    if (!grouped[year][monthName][log.date][key]) {
+      grouped[year][monthName][log.date][key] = { label, count: 0, type: log.type || 'bike', details };
     }
-    grouped[year][monthName][log.date][code] += (log.quantity || 1);
+    grouped[year][monthName][log.date][key].count += (log.quantity || 1);
   });
 
   return (
@@ -87,7 +106,7 @@ export function WorkerHistory() {
         <div>
           {Object.keys(grouped).length === 0 ? (
             <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
-              No hay bicicletas registradas en tu historial.
+              No hay trabajos registrados en tu historial.
             </div>
           ) : (
             Object.keys(grouped).sort((a, b) => b.localeCompare(a)).map(year => (
@@ -126,7 +145,13 @@ export function WorkerHistory() {
                             <div style={{ marginLeft: '1rem', borderLeft: '2px solid var(--border-color)', paddingLeft: '0.5rem' }}>
                               {Object.keys(grouped[year][month]).sort((a, b) => b.localeCompare(a)).map(date => {
                                 const dayKey = `${year}-${month}-${date}`;
-                                const totalDayBikes = Object.values(grouped[year][month][date]).reduce((a, b) => a + b, 0);
+                                const dayItems = Object.values(grouped[year][month][date]);
+                                const totalBikesOrFurn = dayItems.filter(i => i.type !== 'warehouse').reduce((a, b) => a + b.count, 0);
+                                const totalWh = dayItems.filter(i => i.type === 'warehouse').length;
+                                
+                                let summaryText = [];
+                                if (totalBikesOrFurn > 0) summaryText.push(`${totalBikesOrFurn} items`);
+                                if (totalWh > 0) summaryText.push(`${totalWh} chambas`);
                                 
                                 return (
                                   <div key={dayKey} style={{ marginTop: '0.5rem' }}>
@@ -137,18 +162,23 @@ export function WorkerHistory() {
                                     >
                                       <span>Fecha: <strong style={{ color: 'var(--text-primary)' }}>{date}</strong></span>
                                       <span style={{ color: 'var(--accent-orange)', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                                        {totalDayBikes} bicis {expandedDays[dayKey] ? <ChevronDown size={16} style={{ verticalAlign: 'middle' }} /> : <ChevronRight size={16} style={{ verticalAlign: 'middle' }} />}
+                                        {summaryText.join(' + ') || '0 items'} {expandedDays[dayKey] ? <ChevronDown size={16} style={{ verticalAlign: 'middle' }} /> : <ChevronRight size={16} style={{ verticalAlign: 'middle' }} />}
                                       </span>
                                     </div>
 
                                     {expandedDays[dayKey] && (
                                       <div style={{ padding: '0.5rem 1rem', backgroundColor: '#1e1e1e', borderRadius: '0 0 4px 4px', fontSize: '0.9rem' }}>
                                         {Object.entries(grouped[year][month][date])
-                                          .sort(([codeA], [codeB]) => codeA.localeCompare(codeB, undefined, { numeric: true }))
-                                          .map(([code, count]) => (
-                                          <div key={code} className="flex-between" style={{ padding: '4px 0', borderBottom: '1px dashed #333' }}>
-                                            <span style={{ color: 'var(--text-secondary)' }}>{code}</span>
-                                            <strong style={{ color: 'var(--text-primary)' }}>{count} u.</strong>
+                                          .sort(([, a], [, b]) => a.label.localeCompare(b.label, undefined, { numeric: true }))
+                                          .map(([key, item]) => (
+                                          <div key={key} className="flex-between" style={{ padding: '4px 0', borderBottom: '1px dashed #333' }}>
+                                            <span style={{ color: 'var(--text-secondary)' }}>
+                                              {item.label}
+                                              {item.details && <span style={{fontSize: '0.8rem', marginLeft: '8px', color: '#888'}}> ({item.details})</span>}
+                                            </span>
+                                            {item.type !== 'warehouse' && (
+                                              <strong style={{ color: 'var(--text-primary)' }}>{item.count} u.</strong>
+                                            )}
                                           </div>
                                         ))}
                                       </div>
