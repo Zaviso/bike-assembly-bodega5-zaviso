@@ -24,11 +24,11 @@ function Home() {
       <div className="grid grid-cols-2" style={{ gap: '2rem', width: '100%', maxWidth: '600px' }}>
         <div 
           className="card interactive flex-center" 
-          style={{ flexDirection: 'column', cursor: 'pointer', padding: '3rem 1rem' }}
+          style={{ flexDirection: 'column', cursor: 'pointer', padding: '1.5rem 1rem' }}
           onClick={() => navigate('/worker')}
         >
-          <Wrench size={48} className="text-accent mb-2" />
-          <h2>Soy Armador</h2>
+          <Wrench size={36} className="text-accent mb-2" />
+          <h2 style={{ fontSize: '1.25rem' }}>Soy Armador</h2>
           <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', textAlign: 'center' }}>
             Registrar producción y ayuda en bodegas
           </p>
@@ -36,7 +36,7 @@ function Home() {
 
         <div 
           className="card interactive flex-center" 
-          style={{ flexDirection: 'column', cursor: 'pointer', padding: '3rem 1rem' }}
+          style={{ flexDirection: 'column', cursor: 'pointer', padding: '1.5rem 1rem' }}
           onClick={async () => {
             const { value: pin } = await Swal.fire({
               title: 'Acceso Restringido',
@@ -63,8 +63,8 @@ function Home() {
             }
           }}
         >
-          <Settings size={48} className="text-accent mb-2" />
-          <h2>Administrador</h2>
+          <Settings size={36} className="text-accent mb-2" />
+          <h2 style={{ fontSize: '1.25rem' }}>Administrador</h2>
           <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', textAlign: 'center' }}>
             Dashboard, gestión y reportes
           </p>
@@ -128,46 +128,46 @@ function App() {
     return <GlobalLockScreen onUnlock={() => setIsUnlocked(true)} />;
   }
 
-  return (
     <BrowserRouter>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <header style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-panel)' }}>
+          <img src="/1.png" alt="Saviso" style={{ height: '24px', objectFit: 'contain' }} />
+        </header>
 
+        <main style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            
+            {/* Worker Routes */}
+            <Route path="/worker" element={<WorkerDashboard />} />
+            <Route path="/worker/bike" element={<BikeForm />} />
+            <Route path="/worker/history" element={<WorkerHistory />} />
+            <Route path="/worker/furniture" element={<FurnitureForm />} />
+            <Route path="/worker/warehouse" element={<WarehouseForm />} />
 
-      <div style={{ 
-        position: 'fixed', 
-        bottom: 0, 
-        left: 0, 
-        right: 0,
-        padding: '16px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
-        color: 'var(--text-secondary)',
-        fontSize: '0.85rem',
-        fontWeight: 500,
-        zIndex: 1000, 
-        pointerEvents: 'none',
-        gap: '8px'
-      }}>
-        <span>Hecho por</span>
-        <img src="/1.png" alt="Saviso" style={{ height: '20px', objectFit: 'contain', marginLeft: '4px' }} />
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/catalog" element={<CatalogManager />} />
+            <Route path="/admin/team" element={<TeamManager />} />
+            <Route path="/admin/logs" element={<LogsViewer />} />
+          </Routes>
+        </main>
+
+        <div style={{ 
+          padding: '16px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'var(--text-secondary)',
+          fontSize: '0.85rem',
+          fontWeight: 500,
+          gap: '8px',
+          marginTop: 'auto'
+        }}>
+          <span>Hecho por</span>
+          <img src="/1.png" alt="Saviso" style={{ height: '18px', objectFit: 'contain', marginLeft: '4px', opacity: 0.7 }} />
+        </div>
       </div>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        
-        {/* Worker Routes */}
-        <Route path="/worker" element={<WorkerDashboard />} />
-        <Route path="/worker/bike" element={<BikeForm />} />
-        <Route path="/worker/history" element={<WorkerHistory />} />
-        <Route path="/worker/furniture" element={<FurnitureForm />} />
-        <Route path="/worker/warehouse" element={<WarehouseForm />} />
-
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/catalog" element={<CatalogManager />} />
-        <Route path="/admin/team" element={<TeamManager />} />
-        <Route path="/admin/logs" element={<LogsViewer />} />
-      </Routes>
     </BrowserRouter>
   );
 }
