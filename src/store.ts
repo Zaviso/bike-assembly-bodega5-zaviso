@@ -51,9 +51,11 @@ export type AppData = {
 
 export const getAppData = async (): Promise<AppData> => {
   try {
-    const workersSnapshot = await getDocs(collection(db, 'workers'));
-    const catalogSnapshot = await getDocs(collection(db, 'catalog'));
-    const logsSnapshot = await getDocs(collection(db, 'logs'));
+    const [workersSnapshot, catalogSnapshot, logsSnapshot] = await Promise.all([
+      getDocs(collection(db, 'workers')),
+      getDocs(collection(db, 'catalog')),
+      getDocs(collection(db, 'logs'))
+    ]);
 
     const workers = workersSnapshot.docs.map(d => ({ id: d.id, ...d.data() } as Worker));
     const catalog = catalogSnapshot.docs.map(d => ({ id: d.id, ...d.data() } as BikeCatalogItem));
