@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Bike, FileText, ArrowLeft, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import { Users, Bike, FileText, ArrowLeft, RefreshCw, ChevronDown, ChevronRight, Printer } from 'lucide-react';
 import { getAppData, type LogEntry, type BikeCatalogItem, type Worker } from '../../store';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -50,6 +52,28 @@ export function AdminDashboard() {
     acc[code] = (acc[code] || 0) + (curr.quantity || 1);
     return acc;
   }, {} as Record<string, number>);
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(16);
+    doc.text('Inventario Físico (Bicicletas)', 14, 20);
+    
+    const tableData = catalog.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true })).map(bike => {
+      const received = bike.receivedQuantity || 0;
+      const assembled = allTimeBikeCounts[bike.code] || 0;
+      const remaining = received - assembled;
+      return [bike.code, received, assembled, remaining];
+    });
+
+    autoTable(doc, {
+      startY: 30,
+      head: [['Código', 'Recibidas (Cajas)', 'Armadas Totales', 'Físico Esperado']],
+      body: tableData,
+    });
+
+    doc.save('inventario-fisico.pdf');
+  };
 
   return (
     <div className="app-container animate-fade-in" style={{ paddingBottom: '3rem' }}>
@@ -126,7 +150,13 @@ export function AdminDashboard() {
         )}
       </div>
 
-      <h3 className="mb-2 mt-4">Inventario Físico (Bicicletas)</h3>
+      <div className="flex-between mb-2 mt-4">
+        <h3 style={{ margin: 0 }}>Inventario Físico (Bicicletas)</h3>
+        <button className="secondary flex-center" onClick={generatePDF} style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}>
+          <Printer size={16} style={{ marginRight: '6px' }} />
+          Imprimir PDF
+        </button>
+      </div>
       <div className="mb-4" style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', minWidth: '500px', borderCollapse: 'collapse', backgroundColor: 'var(--bg-panel)', borderRadius: '8px', overflow: 'hidden' }}>
           <thead>

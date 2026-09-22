@@ -21,7 +21,8 @@
   font-weight: 400;
 
   color: var(--text-primary);
-  background-color: var(--bg-dark);
+  background: radial-gradient(circle at 50% 0%, #1a1a1a 0%, var(--bg-dark) 100%);
+  background-attachment: fixed;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -133,17 +134,18 @@ label {
 }
 
 .card {
-  background-color: var(--bg-panel);
+  background: linear-gradient(145deg, #2a2a2a, #222222);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .card.interactive:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(255, 112, 67, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 112, 67, 0.4);
 }
 
 .flex-center {
