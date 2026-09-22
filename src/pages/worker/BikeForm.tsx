@@ -88,6 +88,17 @@ export function BikeForm() {
       .reduce((acc, curr) => acc + (curr.quantity || 1), 0);
   };
 
+  const myTodayBikeLogs = logs.filter(l => l.type === 'bike' && l.workerId === selectedWorker && l.date === date);
+  
+  const todayCountsByCode = myTodayBikeLogs.reduce((acc, curr) => {
+    const bike = catalog.find(b => b.id === curr.bikeId);
+    const code = bike ? bike.code : 'Desconocido';
+    acc[code] = (acc[code] || 0) + (curr.quantity || 1);
+    return acc;
+  }, {} as Record<string, number>);
+
+  const totalToday = Object.values(todayCountsByCode).reduce((a, b) => a + b, 0);
+
   return (
     <div className="app-container animate-fade-in" style={{ paddingBottom: '2rem' }}>
       <div className="flex-between mb-4">
@@ -114,6 +125,30 @@ export function BikeForm() {
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
         </div>
       </div>
+
+      {selectedWorker && (
+        <div className="card mb-4" style={{ borderLeft: '4px solid var(--accent-yellow)', backgroundColor: 'var(--bg-card)' }}>
+          <div className="flex-between mb-2" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+            <h3 style={{ margin: 0, color: 'var(--accent-yellow)' }}>Mi Avance ({date})</h3>
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{totalToday} bicis</span>
+          </div>
+          
+          {Object.keys(todayCountsByCode).length === 0 ? (
+            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.9rem' }}>Aún no has armado bicicletas en esta fecha.</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {Object.entries(todayCountsByCode)
+                .sort(([codeA], [codeB]) => codeA.localeCompare(codeB, undefined, { numeric: true }))
+                .map(([code, count]) => (
+                <div key={code} className="flex-between" style={{ backgroundColor: 'var(--bg-dark)', padding: '0.4rem 0.8rem', borderRadius: '4px' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{code}</span>
+                  <strong style={{ fontSize: '1rem' }}>{count}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {selectedWorker ? (
         <div className="grid">
