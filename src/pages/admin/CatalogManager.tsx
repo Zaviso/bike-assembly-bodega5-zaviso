@@ -12,6 +12,7 @@ export function CatalogManager() {
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
+  const [receivedQuantity, setReceivedQuantity] = useState<number | ''>('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,7 +67,8 @@ export function CatalogManager() {
     setEditingId(bike.id);
     setCode(bike.code);
     setDescription(bike.description);
-    setImage(bike.image);
+    setImage(bike.image || '');
+    setReceivedQuantity(bike.receivedQuantity || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -75,15 +77,17 @@ export function CatalogManager() {
     setCode('');
     setDescription('');
     setImage('');
+    setReceivedQuantity('');
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code || !description) return;
+    const parsedQuantity = receivedQuantity === '' ? 0 : Number(receivedQuantity);
     
     if (editingId) {
-      await updateBikeInCatalog(editingId, { code, description, image });
+      await updateBikeInCatalog(editingId, { code, description, image, receivedQuantity: parsedQuantity });
       Swal.fire({
         toast: true,
         position: 'top-end',
@@ -93,7 +97,7 @@ export function CatalogManager() {
         timer: 1500
       });
     } else {
-      await addBikeToCatalog({ code, description, image });
+      await addBikeToCatalog({ code, description, image, receivedQuantity: parsedQuantity });
       Swal.fire({
         toast: true,
         position: 'top-end',
@@ -153,6 +157,10 @@ export function CatalogManager() {
         <div className="mb-2">
           <label>Descripción</label>
           <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Mountain Bike Aro 29..." required />
+        </div>
+        <div className="mb-2">
+          <label>Cantidad Recibida (Inventario Inicial)</label>
+          <input type="number" min="0" value={receivedQuantity} onChange={e => setReceivedQuantity(e.target.value === '' ? '' : parseInt(e.target.value))} placeholder="Ej: 150" />
         </div>
         <div className="mb-4">
           <label>Imagen</label>

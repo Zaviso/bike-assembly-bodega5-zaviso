@@ -13,6 +13,7 @@ export type BikeCatalogItem = {
   code: string;
   description: string;
   image: string; // Base64 or URL
+  receivedQuantity?: number; // Total boxes arrived/received
   createdAt?: number;
 };
 
