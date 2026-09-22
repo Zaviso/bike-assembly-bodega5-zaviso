@@ -63,13 +63,33 @@ export function CatalogManager() {
     }
   };
 
-  const handleEditClick = (bike: BikeCatalogItem) => {
-    setEditingId(bike.id);
-    setCode(bike.code);
-    setDescription(bike.description);
-    setImage(bike.image || '');
-    setReceivedQuantity(bike.receivedQuantity || '');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleEditClick = async (bike: BikeCatalogItem) => {
+    const { value: pin } = await Swal.fire({
+      title: 'Acceso Restringido',
+      input: 'password',
+      inputLabel: 'Introduce el PIN para editar',
+      inputPlaceholder: 'PIN',
+      showCancelButton: true,
+      confirmButtonText: 'Continuar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#f97316',
+    });
+    
+    if (pin === 'E.Labra5') {
+      setEditingId(bike.id);
+      setCode(bike.code);
+      setDescription(bike.description);
+      setImage(bike.image || '');
+      setReceivedQuantity(bike.receivedQuantity || '');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (pin) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Acceso denegado',
+        text: 'PIN incorrecto',
+        confirmButtonColor: '#f97316',
+      });
+    }
   };
 
   const handleCancelEdit = () => {
@@ -113,27 +133,47 @@ export function CatalogManager() {
   };
 
   const handleRemove = async (id: string) => {
-    const result = await Swal.fire({
-      title: '¿Eliminar bicicleta?',
-      text: '¿Seguro que deseas eliminar esta bicicleta del catálogo?',
-      icon: 'warning',
+    const { value: pin } = await Swal.fire({
+      title: 'Acceso Restringido',
+      input: 'password',
+      inputLabel: 'Introduce el PIN para eliminar',
+      inputPlaceholder: 'PIN',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#444',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: 'Continuar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ef4444',
     });
 
-    if (result.isConfirmed) {
-      await removeBikeFromCatalog(id);
-      loadCatalog();
+    if (pin === 'E.Labra5') {
+      const result = await Swal.fire({
+        title: '¿Eliminar bicicleta?',
+        text: '¿Seguro que deseas eliminar esta bicicleta del catálogo?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      });
+
+      if (result.isConfirmed) {
+        await removeBikeFromCatalog(id);
+        loadCatalog();
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Bicicleta eliminada',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    } else if (pin) {
       Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Bicicleta eliminada',
-        showConfirmButton: false,
-        timer: 1500
+        icon: 'error',
+        title: 'Acceso denegado',
+        text: 'PIN incorrecto',
+        confirmButtonColor: '#ef4444',
       });
     }
   };
