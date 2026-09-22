@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Bike, FileText, ArrowLeft, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
-import { getAppData, type LogEntry, type BikeCatalogItem } from '../../store';
+import { getAppData, type LogEntry, type BikeCatalogItem, type Worker } from '../../store';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
