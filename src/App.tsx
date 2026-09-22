@@ -127,7 +127,7 @@ function App() {
   if (!isUnlocked) {
     return <GlobalLockScreen onUnlock={() => setIsUnlocked(true)} />;
   }
-
+  return (
     <BrowserRouter>
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <header style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-panel)' }}>
