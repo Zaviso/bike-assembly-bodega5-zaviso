@@ -154,18 +154,18 @@ function App() {
         </main>
 
         <div style={{ 
-          padding: '16px',
+          padding: '24px 16px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           color: 'var(--text-secondary)',
-          fontSize: '0.85rem',
+          fontSize: '1rem',
           fontWeight: 500,
           gap: '8px',
           marginTop: 'auto'
         }}>
           <span>Hecho por</span>
-          <img src="/1.png" alt="Saviso" style={{ height: '18px', objectFit: 'contain', marginLeft: '4px', opacity: 0.7 }} />
+          <img src="/1.png" alt="Saviso" style={{ height: '24px', objectFit: 'contain', marginLeft: '4px', opacity: 0.8 }} />
         </div>
       </div>
     </BrowserRouter>
